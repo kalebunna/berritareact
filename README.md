@@ -1,64 +1,111 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+[![Code Climate](https://codeclimate.com/github/talyssonoc/react-laravel/badges/gpa.svg)](https://codeclimate.com/github/talyssonoc/react-laravel) [![Build Status](https://travis-ci.org/talyssonoc/react-laravel.svg?branch=master)](https://travis-ci.org/talyssonoc/react-laravel)
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# react-laravel
 
-## About Laravel
+With `react-laravel` you'll be able to use [ReactJS](https://facebook.github.io/react/) components right from your Blade views, with optional server-side rendering, and use them on the client-side with React due to unobtrusive JavaScript.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+# Installation
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## V8js dependency
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+It's important to know that `react-laravel` has an indirect dependency of the [v8js](https://pecl.php.net/package/v8js) PHP extension.
 
-## Learning Laravel
+You can see how to install it here: [how to install v8js](install_v8js.md).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Composer
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Set the `minimum-stability` of your `composer.json` to `dev`, adding this:
 
-## Laravel Sponsors
+```json
+  "minimum-stability": "dev"
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+Then run:
 
-### Premium Partners
+```sh
+  $ composer require talyssonoc/react-laravel:0.11
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+After that you should add this to your providers at the `config/app.php` file of your Laravel app:
 
-## Contributing
+```php
+  'React\ReactServiceProvider'
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+And then run:
 
-## Code of Conduct
+```sh
+  php artisan vendor:publish
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+And the `react.php` file will be available at the `config` folder of your app.
 
-## Security Vulnerabilities
+# Usage
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+After the installation and configuration, you'll be able to use the `@react_component` directive in your views.
 
-## License
+The `@react_component` directive accepts 3 arguments:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```php
+  @react_component(<componentName>[, props, options])
+
+  //example
+  @react_component('Message', [ 'title' => 'Hello, World' ], [ 'prerender' => true ])
+
+  // example using namespaced component
+  @react_component('Acme.Message', [ 'title' => 'Hello, World' ], [ 'prerender' => true ])
+```
+
+* `componentName`: Is the name of the global variable that holds your component.  When using [Namespaced Components](https://facebook.github.io/react/docs/jsx-in-depth.html#namespaced-components) you may use dot-notation for the component name.
+* `props`: Associative of the `props` that'll be passed to your component
+* `options`: Associative array of options that you can pass to the `react-laravel`:
+  * `prerender`: Tells react-laravel to render your component server-side, and then just _mount_ it on the client-side. Default to __true__.
+  * `tag`: The tag of the element that'll hold your component. Default to __'div'__.
+  * _html attributes_: Any other valid HTML attribute that will be added to the wrapper element of your component. Example: `'id' => 'my_component'`.
+
+All your components should be inside `public/js/components.js` (you can configure it, see below) and be global.
+
+You must include `react.js`, `react-dom.js` and `react_ujs.js` (in this order) in your view. You can concatenate these files together using laravel-elixir.
+
+`react-laravel` provides a ReactJS installation and the `react_us.js` file, they'll be at `public/vendor/react-laravel` folder after you install `react-laravel` and run:
+
+```sh
+  $ php artisan vendor:publish --force
+```
+
+For using the files provided by `react-laravel` and your `components.js` file, add this to your view:
+
+```html
+  <script src="{{ asset('vendor/react-laravel/react.js') }}"></script>
+  <script src="{{ asset('vendor/react-laravel/react-dom.js') }}"></script>
+  <script src="{{ asset('js/components.js') }}"></script>
+  <script src="{{ asset('vendor/react-laravel/react_ujs.js') }}"></script>
+```
+
+If you'll use a different version from the one provided by react-laravel (see `composer.json`), you got to configure it (see below).
+
+# Configurations
+
+You can change settings to `react-laravel` at the `config/react.php` file:
+
+```php
+  return [
+    'source' => 'path_for_react.js',
+    'dom-source' => 'path_for_react-dom.js',
+    'dom-server-source' => 'path_for_react-dom-server.js',
+    'components' => [ 'path_for_file_containing_your_components.js' ]
+  ];
+```
+
+All of them are optional.
+
+* `source`: defaults to `public/vendor/react-laravel/react.js`.
+* `dom-source`: defaults to `public/vendor/react-laravel/react-dom.js`.
+* `dom-server-source`: defaults to `public/vendor/react-laravel/react-dom-server.js`.
+* `components`: defaults to `public/js/components.js`. Multiple components files may be specified here.
+
+Your `components.js` file(s) should also be included at your view, and all your components must be at the `window` object.
+
+# Thanks
+
+This package is inspired at [react-rails](https://github.com/reactjs/react-rails).

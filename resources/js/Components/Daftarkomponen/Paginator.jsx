@@ -7,7 +7,7 @@ const Paginator = ({ meta }) => {
     const current = meta.current_page;
     console.log(next);
     return (
-        <div className="btn-group">
+        <div className="m-10 btn-group">
             <Link className="btn" href={prev}>
                 Prev
             </Link>
